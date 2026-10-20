@@ -1,0 +1,6 @@
+{
+  "name": "FinRateCalc - US Precision Financial Tools",
+  "description": "Professional US financial calculator suite featuring Mortgage with PMI & Escrow, Take-Home Pay with Federal & State taxes, 401(k) Retirement with IRS caps, Auto Loans, and Debt Payoff.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
