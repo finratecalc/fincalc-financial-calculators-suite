@@ -125,7 +125,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Primary Desktop Nav Category Links */}
         {/* PROFESSIONAL CLEAN NAVIGATION (NO DUPLICATION) */}
-          <nav className="hidden lg:flex items-center space-x-6 text-sm font-medium">
+          <nav className="flex items-center space-x-4 md:space-x-6 text-sm font-medium">
             <button
               onClick={() => onSelectCalc('directory')}
               className={`transition-colors py-1.5 px-3 rounded-md ${
