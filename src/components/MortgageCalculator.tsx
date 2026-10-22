@@ -1247,6 +1247,95 @@ export const MortgageCalculator: React.FC<MortgageCalculatorProps> = ({
           </div>
         )}
       </div>
+      {/* MORTGAGE SEO CONTENT SECTION */}
+      <section className="max-w-5xl mx-auto my-12 px-4 text-slate-800 leading-relaxed border-t border-slate-200 pt-10">
+        <div className="mb-8 border-b border-slate-200 pb-6">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-3">
+            Accurately Estimate Your Monthly US Mortgage Payment
+          </h2>
+          <p className="text-lg text-slate-600">
+            Whether you are scouting your first single-family home in suburban Texas or refinancing a property in California, a purchase price only tells half the story. The <strong>FinRateCalc Mortgage Calculator</strong> factors in principal, interest, local property taxes, homeowners insurance, and Private Mortgage Insurance (PMI) to deliver an exact, real-world estimate of your true monthly obligation.
+          </p>
+        </div>
+
+        <div className="mb-10">
+          <h3 className="text-xl font-bold text-teal-700 mb-4">
+            How to Use This Calculator (Step-by-Step)
+          </h3>
+          <ul className="list-disc pl-5 space-y-2 text-slate-700">
+            <li><strong>Home Purchase Price & Down Payment:</strong> Enter the target purchase price and your cash down payment (typically 3% to 20% or more in the US).</li>
+            <li><strong>Loan Term:</strong> Choose between a 30-year fixed-rate (lower monthly commitment) or a 15-year fixed-rate (aggressive equity build-up and lower lifetime interest).</li>
+            <li><strong>Interest Rate (APR):</strong> Input your estimated note rate. Our tool tracks benchmark averages against weekly Freddie Mac PMMS surveys.</li>
+            <li><strong>Taxes & Insurance:</strong> Input your local county property tax rate and annual insurance quote for full PITI calculation.</li>
+          </ul>
+        </div>
+
+        <div className="mb-10 bg-slate-50 border border-slate-200 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-slate-900 mb-2">
+            Understanding PITI: What Makes Up Your Mortgage Bill?
+          </h3>
+          <p className="text-slate-600 mb-6">
+            Under standard US escrow arrangements, your monthly mortgage payment consists of four core components:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white p-4 rounded-lg border-l-4 border-sky-600 shadow-sm">
+              <h4 className="font-bold text-sky-700 mb-1">Principal</h4>
+              <p className="text-sm text-slate-600">Directly reduces your outstanding loan balance and builds equity.</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg border-l-4 border-teal-600 shadow-sm">
+              <h4 className="font-bold text-teal-700 mb-1">Interest</h4>
+              <p className="text-sm text-slate-600">The fee charged by your lender for borrowing capital.</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg border-l-4 border-amber-600 shadow-sm">
+              <h4 className="font-bold text-amber-700 mb-1">Property Taxes</h4>
+              <p className="text-sm text-slate-600">Local municipal and county taxes supporting schools and infrastructure.</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg border-l-4 border-purple-600 shadow-sm">
+              <h4 className="font-bold text-purple-700 mb-1">Hazard Insurance</h4>
+              <p className="text-sm text-slate-600">Protects the asset against fire, hazards, and liability via escrow.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-10">
+          <h3 className="text-xl font-bold text-slate-900 mb-3">
+            The Math Behind the Calculation
+          </h3>
+          <p className="text-slate-700 mb-3">
+            FinRateCalc uses the standard US amortization formula enforced under Truth in Lending Act (TILA / Regulation Z) rules:
+          </p>
+          <div className="bg-slate-900 text-sky-400 p-4 rounded-lg font-mono text-center text-lg my-4">
+            M = P [ r(1 + r)^n ] / [ (1 + r)^n - 1 ]
+          </div>
+          <p className="text-sm text-slate-600">
+            Where <strong>M</strong> is monthly principal and interest, <strong>P</strong> is principal loan balance, <strong>r</strong> is monthly interest rate, and <strong>n</strong> is total number of monthly payments (360 for 30 years).
+          </p>
+        </div>
+
+        <div className="mb-12">
+          <h3 className="text-2xl font-bold text-slate-900 border-b border-slate-200 pb-3 mb-6">
+            Frequently Asked Questions (Mortgage FAQs)
+          </h3>
+          <div className="space-y-6">
+            <div>
+              <h4 className="text-lg font-semibold text-teal-700 mb-1">How much down payment do I really need in the US?</h4>
+              <p className="text-slate-600">While 20% down avoids PMI, conventional loans can start at 3% down, FHA loans at 3.5%, and eligible VA/USDA loans at 0% down.</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold text-teal-700 mb-1">What credit score is required for a conventional home loan?</h4>
+              <p className="text-slate-600">Most conventional lenders look for a minimum 620 FICO score. Scores of 740 and above secure the lowest interest rates and minimal PMI premiums.</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold text-teal-700 mb-1">What is the 28/36 qualifying rule?</h4>
+              <p className="text-slate-600">Lenders prefer front-end housing costs (PITI) do not exceed 28% of gross monthly income, and total back-end debt payments stay under 36%.</p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold text-teal-700 mb-1">Should I choose a 15-year or a 30-year fixed loan?</h4>
+              <p className="text-slate-600">A 30-year loan offers lower monthly payments for budget flexibility. A 15-year loan features lower interest rates and builds full equity in half the time.</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
