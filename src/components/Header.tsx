@@ -124,78 +124,45 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Primary Desktop Nav Category Links */}
-        <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600">
-          <button
-            onClick={() => onSelectCalc('mortgage')}
-            className={`transition-colors pb-0.5 ${
-              activeCalc === 'mortgage'
-                ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            Mortgage
-          </button>
-          <button
-            onClick={() => onSelectCalc('personal-loan')}
-            className={`transition-colors pb-0.5 ${
-              activeCalc === 'personal-loan'
-                ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            Loans
-          </button>
-          <button
-            onClick={() => onSelectCalc('compound')}
-            className={`transition-colors pb-0.5 ${
-              activeCalc === 'compound'
-                ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            Investment
-          </button>
-          <button
-            onClick={() => onSelectCalc('auto-loan')}
-            className={`transition-colors pb-0.5 ${
-              activeCalc === 'auto-loan'
-                ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            Auto Loan
-          </button>
-          <button
-            onClick={() => onSelectCalc('401k')}
-            className={`transition-colors pb-0.5 ${
-              activeCalc === '401k'
-                ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            401(k)
-          </button>
-          <button
-            onClick={() => onSelectCalc('take-home')}
-            className={`transition-colors pb-0.5 ${
-              activeCalc === 'take-home'
-                ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            Take-Home Pay
-          </button>
-          <button
-            onClick={() => onSelectCalc('directory')}
-            className={`transition-colors pb-0.5 ${
-              activeCalc === 'directory'
-                ? 'text-emerald-600 font-semibold border-b-2 border-emerald-600'
-                : 'hover:text-slate-900'
-            }`}
-          >
-            All 8 Calculators
-          </button>
-        </nav>
+        {/* PROFESSIONAL CLEAN NAVIGATION (NO DUPLICATION) */}
+          <nav className="hidden lg:flex items-center space-x-6 text-sm font-medium">
+            <button
+              onClick={() => onSelectCalc('directory')}
+              className={`transition-colors py-1.5 px-3 rounded-md ${
+                activeCalc === 'directory'
+                  ? 'bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              All 8 Calculators
+            </button>
+
+            <a
+              href="#benchmarks"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('benchmarks')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-slate-600 hover:text-slate-900 transition-colors py-1.5 px-2"
+              title="IRS & Federal Reserve Benchmarks"
+            >
+              Methodology & Data
+            </a>
+
+            <a
+              href="/privacy-policy.html"
+              className="text-slate-600 hover:text-slate-900 transition-colors py-1.5 px-2"
+            >
+              Privacy & Trust
+            </a>
+
+            <a
+              href="mailto:support@finratecalc.com"
+              className="text-slate-600 hover:text-slate-900 transition-colors py-1.5 px-2"
+            >
+              Contact
+            </a>
+          </nav>
 
         {/* Right Tools & Actions */}
         <div className="flex items-center gap-2.5 shrink-0">
