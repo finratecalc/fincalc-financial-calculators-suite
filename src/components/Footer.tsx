@@ -131,11 +131,11 @@ export const Footer: React.FC<FooterProps> = ({ onSelectCalc }) => {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 text-xs text-slate-500">
             <p>© {new Date().getFullYear()} FinRateCalc.com. All rights reserved.</p>
             <div className="flex gap-4">
-              <span className="hover:text-slate-300 cursor-pointer">Privacy Policy</span>
+              <a href="/privacy-policy.html">Privacy Policy</a>
               <span>·</span>
-              <span className="hover:text-slate-300 cursor-pointer">Terms of Service</span>
+              <a href="/terms.html">Terms of Service</a>
               <span>·</span>
-              <span className="hover:text-slate-300 cursor-pointer">Equal Housing Opportunity Disclaimer</span>
+              <a href="/equal-housing.html">Equal Housing Opportunity Disclaimer</a>
             </div>
           </div>
         </div>
