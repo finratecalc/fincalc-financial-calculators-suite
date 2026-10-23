@@ -342,6 +342,11 @@ const [showMethodology, setShowMethodology] = useState(false); export const Head
               <button
                 onClick={() => setShowMethodology(false)}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs md:text-sm px-5 py-2.5 rounded-lg transition-colors shadow-sm"
+              {/* Footer Close Button */}
+            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+              <button
+                onClick={() => setShowMethodology(false)}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs md:text-sm px-5 py-2.5 rounded-lg transition-colors shadow-sm"
               >
                 Close &amp; Return to Calculators
               </button>
@@ -350,14 +355,9 @@ const [showMethodology, setShowMethodology] = useState(false); export const Head
           </div>
         </div>
       )}
-  );
-};
-</div>
-      </div>
-    )}
 
     </header>
   );
 };
-export default Header;
 
+export default Header;
