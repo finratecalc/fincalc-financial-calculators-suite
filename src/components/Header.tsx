@@ -360,4 +360,4 @@ const [showMethodology, setShowMethodology] = useState(false); export const Head
   );
 };
 
-export default Header;
+
