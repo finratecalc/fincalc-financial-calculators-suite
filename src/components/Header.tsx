@@ -28,7 +28,10 @@ interface HeaderProps {
   onSelectRecent: (item: RecentCalculation) => void;
 }
 
-const [showMethodology, setShowMethodology] = useState(false); export const Header: React.FC<HeaderProps> = ({
+export const Header: React.FC<HeaderProps> = ({
+  // yahan jo bhi purane props likhe hain wo rehne dein
+}) => {
+  const [showMethodology, setShowMethodology] = useState(false);
   activeCalc,
   onSelectCalc,
   onOpenReport,
@@ -337,11 +340,7 @@ const [showMethodology, setShowMethodology] = useState(false); export const Head
               </div>
             </div>
 
-            {/* Footer Close Button */}
-            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
-              <button
-                onClick={() => setShowMethodology(false)}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs md:text-sm px-5 py-2.5 rounded-lg transition-colors shadow-sm"
+            
               {/* Footer Close Button */}
             <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
               <button
