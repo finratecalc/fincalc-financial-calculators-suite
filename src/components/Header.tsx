@@ -137,13 +137,14 @@ const [showMethodology, setShowMethodology] = useState(false); export const Head
               className="text-slate-600 hover:text-slate-900 transition-colors py-1.5 px-2"
               title="IRS & Federal Reserve Benchmarks"
             >
-              Methodology & Data
-            </a>
-
-            <a
-              href="/privacy-policy.html"
-              className="text-slate-600 hover:text-slate-900 transition-colors py-1.5 px-2"
-            >
+              <button
+            type="button"
+            onClick={() => setShowMethodology(true)}
+            className="text-slate-600 hover:text-slate-900 transition-colors py-1.5 px-2 font-medium"
+            title="Methodology, Formulas & Data Sources"
+          >
+            Methodology &amp; Data
+          </button>
               Privacy & Trust
             </a>
 
