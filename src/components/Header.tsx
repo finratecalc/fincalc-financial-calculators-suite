@@ -29,9 +29,6 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  // yahan jo bhi purane props likhe hain wo rehne dein
-}) => {
-  const [showMethodology, setShowMethodology] = useState(false);
   activeCalc,
   onSelectCalc,
   onOpenReport,
@@ -40,6 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
   recentCalculations,
   onSelectRecent,
 }) => {
+  const [showMethodology, setShowMethodology] = useState(false);
   const [showRecentMenu, setShowRecentMenu] = useState(false);
   const [activeTooltipRate, setActiveTooltipRate] = useState<string | null>(null);
 
