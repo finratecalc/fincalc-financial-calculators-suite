@@ -28,7 +28,7 @@ interface HeaderProps {
   onSelectRecent: (item: RecentCalculation) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
+const [showMethodology, setShowMethodology] = useState(false); export const Header: React.FC<HeaderProps> = ({
   activeCalc,
   onSelectCalc,
   onOpenReport,
