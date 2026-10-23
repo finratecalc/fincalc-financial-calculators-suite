@@ -126,16 +126,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Primary Desktop Nav Category Links */}
         {/* PROFESSIONAL CLEAN NAVIGATION (NO DUPLICATION) */}
           <nav className="flex items-center space-x-4 md:space-x-6 text-sm font-medium">
-            <button
-              onClick={() => onSelectCalc('directory')}
-              className={`transition-colors py-1.5 px-3 rounded-md ${
-                activeCalc === 'directory'
-                  ? 'bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              }`}
-            >
-              All 8 Calculators
-            </button>
+           
 
             <a
               href="#benchmarks"
