@@ -258,5 +258,97 @@ const [showMethodology, setShowMethodology] = useState(false); export const Head
         </div>
       </div>
     </header>
+    {/* METHODOLOGY & DATA MODAL (USA COMPLIANT & E-E-A-T) */}
+      {showMethodology && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 text-left">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-slate-100 p-6 md:p-8 relative animate-in fade-in zoom-in-95 duration-150">
+            
+            {/* Header & Close Button */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900">Methodology, Formulas &amp; Data Sources</h3>
+                <p className="text-xs text-slate-500 mt-0.5">FinRateCalc Institutional-Grade Financial Standards</p>
+              </div>
+              <button
+                onClick={() => setShowMethodology(false)}
+                className="text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full w-8 h-8 flex items-center justify-center transition-colors text-lg font-bold"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="space-y-5 text-sm text-slate-600 mt-5 leading-relaxed">
+              <p>
+                FinRateCalc provides transparent, institutional-grade calculation models tailored for U.S. mortgage benchmarks, fixed-rate loans, and personal finance.
+              </p>
+
+              {/* 1. Data Sources */}
+              <div>
+                <h4 className="font-semibold text-slate-900 text-base mb-1.5 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  1. Authoritative U.S. Data Sources
+                </h4>
+                <ul className="list-disc pl-5 space-y-1 text-xs md:text-sm text-slate-600">
+                  <li><strong>Mortgage Benchmarks (30-Yr &amp; 15-Yr Fixed):</strong> Synced with Freddie Mac Primary Mortgage Market Survey® (PMMS) and Federal Reserve FRED.</li>
+                  <li><strong>Inflation &amp; CPI:</strong> Sourced from U.S. Bureau of Labor Statistics (BLS) Consumer Price Index reports.</li>
+                  <li><strong>Statutory Caps:</strong> Internal Revenue Service (IRS) annual contribution caps for 401(k), IRA, and payroll metrics.</li>
+                  <li><strong>Prime &amp; Treasury Rates:</strong> Federal Reserve H.15 statistical releases.</li>
+                </ul>
+              </div>
+
+              {/* 2. Calculation Logic */}
+              <div>
+                <h4 className="font-semibold text-slate-900 text-base mb-1.5 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  2. Mathematical Formulas &amp; Logic
+                </h4>
+                <ul className="list-disc pl-5 space-y-2 text-xs md:text-sm text-slate-600">
+                  <li>
+                    <strong>Standard Loan Amortization:</strong> Monthly Principal &amp; Interest payments are computed via standard U.S. fixed-rate annuity formulations:
+                    <div className="bg-slate-50 border border-slate-200 rounded p-2 font-mono text-xs text-slate-800 mt-1">
+                      M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1 ]
+                    </div>
+                  </li>
+                  <li>
+                    <strong>PMI Trigger:</strong> Conventional loan modeling automatically calculates Private Mortgage Insurance (PMI) when equity (down payment) is below 20% Loan-to-Value (LTV).
+                  </li>
+                  <li>
+                    <strong>Compound Growth:</strong> Calculates compound returns with periodic deposits across daily, monthly, and annual intervals.
+                  </li>
+                </ul>
+              </div>
+
+              {/* 3. Update Frequency */}
+              <div>
+                <h4 className="font-semibold text-slate-900 text-base mb-1 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  3. Update Frequency
+                </h4>
+                <p className="text-xs md:text-sm text-slate-600">
+                  Market indices and benchmark mortgage rates refresh every trading business day at 4:30 PM EST following U.S. market sessions.
+                </p>
+              </div>
+
+              {/* 4. Disclaimer */}
+              <div className="bg-slate-50 border-l-4 border-emerald-500 p-3.5 rounded-r-lg text-xs text-slate-600 space-y-1">
+                <span className="font-semibold text-slate-800 block">U.S. Regulatory Disclaimer:</span>
+                FinRateCalc provides estimations for educational and informational purposes only. We are not a licensed mortgage lender, bank, or registered financial advisor. Actual APR, monthly payments, and closing fees depend on individual lender underwriting and credit eligibility.
+              </div>
+            </div>
+
+            {/* Footer Close Button */}
+            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end">
+              <button
+                onClick={() => setShowMethodology(false)}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs md:text-sm px-5 py-2.5 rounded-lg transition-colors shadow-sm"
+              >
+                Close &amp; Return to Calculators
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
   );
 };
