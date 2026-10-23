@@ -352,3 +352,12 @@ const [showMethodology, setShowMethodology] = useState(false); export const Head
       )}
   );
 };
+</div>
+      </div>
+    )}
+
+    </header>
+  );
+};
+export default Header;
+
