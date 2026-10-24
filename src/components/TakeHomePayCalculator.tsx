@@ -366,6 +366,211 @@ export const TakeHomePayCalculator: React.FC<TakeHomePayCalculatorProps> = ({ on
           </div>
         </div>
       </div>
+      <article className="mt-12 bg-white rounded-2xl border border-slate-200 p-6 sm:p-10 shadow-sm space-y-8 text-left">
+        <header className="space-y-4 border-b border-slate-200 pb-6">
+          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800 uppercase tracking-wider">
+            <span>US Payroll & Tax Strategy Guide</span>
+            <span>·</span>
+            <span>Updated for IRS Tax Year 2026</span>
+            <span>·</span>
+            <span>10 Min Read</span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">
+            How to Calculate Your US Take-Home Pay: Gross vs. Net Income, Tax Brackets, and Deductions
+          </h1>
+
+          <p className="text-base text-slate-600 leading-relaxed">
+            Why does a $100,000 salary look more like $74,000 in your bank account? Here is the exact breakdown of Federal Income Tax, FICA mandatory contributions, state withholdings, and pre-tax mechanisms that determine your real paycheck.
+          </p>
+
+          <div className="text-xs text-slate-500">
+            By <strong>FinRateCalc Editorial & Fiduciary Tax Advisory Desk</strong> · Fact-checked against IRS Pub. 15-T
+          </div>
+        </header>
+
+        <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl p-5 space-y-2.5">
+          <div className="text-xs font-bold text-emerald-900 uppercase tracking-wider">
+            Key Takeaways at a Glance
+          </div>
+          <ul className="space-y-1.5 text-xs sm:text-sm text-emerald-950 leading-relaxed list-disc list-inside">
+            <li><strong>Gross Pay</strong> is your contracted total salary, while <strong>Net Pay (Take-Home Pay)</strong> is the actual cash deposited in your bank.</li>
+            <li>Every W-2 worker pays mandatory <strong>FICA taxes</strong>: 6.2% Social Security (up to statutory cap) and 1.45% Medicare.</li>
+            <li><strong>Progressive Federal Tax Brackets</strong> mean only dollars inside each bracket are taxed at that rate, not your entire income.</li>
+            <li>Pre-tax deductions (401k, HSA, health insurance) reduce your taxable income dollar-for-dollar.</li>
+            <li>Living in a state with no income tax (Texas, Florida, Washington, etc.) saves thousands annually compared to California or New York.</li>
+          </ul>
+        </div>
+
+        <section className="space-y-3">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 border-b border-slate-200 pb-2">
+            1. The Core Equation: Gross Pay vs. Net Pay
+          </h2>
+          <p className="text-sm text-slate-700 leading-relaxed">
+            When you receive a job offer stating a "$90,000 annual salary," that number is your <strong>gross pay</strong>. What arrives via direct deposit every other Friday is your <strong>net pay</strong> (take-home pay).
+          </p>
+          <div className="bg-slate-900 text-white p-4 rounded-xl font-mono text-xs sm:text-sm overflow-x-auto">
+            Take-Home Pay = Gross Pay - (Pre-Tax Deductions + Federal Withholding + FICA Taxes + State Taxes)
+          </div>
+          <p className="text-xs text-slate-500">
+            Budgeting rent, mortgages, and auto loans around your gross pay rather than your net take-home pay is the single most common cause of household financial stress.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 border-b border-slate-200 pb-2">
+            2. Mandatory Deductions: Understanding FICA Taxes
+          </h2>
+          <p className="text-sm text-slate-700 leading-relaxed">
+            All W-2 employees in the United States must pay <strong>FICA (Federal Insurance Contributions Act)</strong> taxes:
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-1">
+              <h3 className="font-bold text-slate-900 text-sm">Social Security Tax (6.2%)</h3>
+              <p className="text-xs text-slate-600">
+                You pay 6.2% of your gross earnings, matched by your employer. Earnings above the annual statutory limit are exempt from further Social Security tax for that year.
+              </p>
+            </div>
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-1">
+              <h3 className="font-bold text-slate-900 text-sm">Medicare Tax (1.45%)</h3>
+              <p className="text-xs text-slate-600">
+                You pay 1.45% on all earnings without any cap. Individuals earning over $200k pay an extra 0.9% Additional Medicare tax.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 border-b border-slate-200 pb-2">
+            3. Federal Progressive Income Tax Brackets
+          </h2>
+          <p className="text-sm text-slate-700 leading-relaxed">
+            Federal taxes are progressive. Moving into a higher bracket only taxes the dollars earned *inside that specific corridor*. Before calculating taxes, subtract your <strong>Standard Deduction</strong> (~$15,000 for single filers, ~$30,000 for married couples).
+          </p>
+
+          <div className="overflow-x-auto border border-slate-200 rounded-xl">
+            <table className="w-full text-xs sm:text-sm text-left">
+              <thead className="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                <tr>
+                  <th className="px-4 py-2.5">Rate</th>
+                  <th className="px-4 py-2.5">Single Filer Bracket</th>
+                  <th className="px-4 py-2.5">Married Filing Jointly</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                <tr>
+                  <td className="px-4 py-2 font-bold text-emerald-700">10%</td>
+                  <td className="px-4 py-2">$0 to $11,925</td>
+                  <td className="px-4 py-2">$0 to $23,850</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2 font-bold text-emerald-700">12%</td>
+                  <td className="px-4 py-2">$11,926 to $48,475</td>
+                  <td className="px-4 py-2">$23,851 to $96,950</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2 font-bold text-emerald-700">22%</td>
+                  <td className="px-4 py-2">$48,476 to $103,350</td>
+                  <td className="px-4 py-2">$96,951 to $206,700</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-2 font-bold text-emerald-700">24%</td>
+                  <td className="px-4 py-2">$103,351 to $197,300</td>
+                  <td className="px-4 py-2">$206,701 to $394,600</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 border-b border-slate-200 pb-2">
+            4. Case Study: An Audited $100,000 Annual Salary
+          </h2>
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-2 text-xs sm:text-sm font-mono">
+            <div className="flex justify-between font-bold text-slate-900">
+              <span>Gross Base Salary:</span>
+              <span>$100,000.00</span>
+            </div>
+            <div className="flex justify-between text-emerald-700">
+              <span>Less: 401(k) Pre-Tax Contribution:</span>
+              <span>-$6,000.00</span>
+            </div>
+            <div className="flex justify-between text-rose-600">
+              <span>Less: FICA Taxes (7.65%):</span>
+              <span>-$7,650.00</span>
+            </div>
+            <div className="flex justify-between text-rose-600">
+              <span>Less: Federal Income Tax:</span>
+              <span>-$12,480.00</span>
+            </div>
+            <div className="flex justify-between text-rose-600">
+              <span>Less: State Tax (~4.4%):</span>
+              <span>-$4,136.00</span>
+            </div>
+            <div className="flex justify-between py-2 border-t border-slate-200 font-bold text-emerald-900 bg-emerald-100/60 px-3 rounded text-sm sm:text-base">
+              <span>Net Take-Home Pay (Annual):</span>
+              <span>$69,734.00</span>
+            </div>
+            <div className="flex justify-between text-slate-500 pt-1 text-xs">
+              <span>Bi-Weekly Paycheck (26x per year):</span>
+              <span className="font-bold text-slate-900">$2,682.08</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 border-b border-slate-200 pb-2">
+            5. Legal Ways to Maximize Your Monthly Take-Home Pay
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <h4 className="font-bold text-slate-900 text-sm">1. Recalibrate Form W-4</h4>
+              <p className="text-xs text-slate-600">
+                If you get a large refund in April, adjust Step 3 or 4 to keep an extra $300 to $400 in each monthly paycheck.
+              </p>
+            </div>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <h4 className="font-bold text-slate-900 text-sm">2. Max Pre-Tax HSAs</h4>
+              <p className="text-xs text-slate-600">
+                Health Savings Accounts bypass Federal, State, and FICA taxes—saving roughly 25% to 30% in immediate tax.
+              </p>
+            </div>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <h4 className="font-bold text-slate-900 text-sm">3. Section 125 Plans</h4>
+              <p className="text-xs text-slate-600">
+                Deduct commuter transit passes, parking, and childcare pre-tax to lower your taxable payroll ceiling.
+              </p>
+            </div>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <h4 className="font-bold text-slate-900 text-sm">4. State Tax Arbitrage</h4>
+              <p className="text-xs text-slate-600">
+                Moving to zero-income-tax states (Texas, Florida, Washington, Nevada, Tennessee) immediately raises liquid income.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 border-b border-slate-200 pb-2">
+            6. Frequently Asked Questions (FAQ)
+          </h2>
+          <div className="space-y-3 text-xs sm:text-sm">
+            <div className="p-4 border border-slate-200 rounded-xl bg-slate-50">
+              <h4 className="font-bold text-slate-900">Bi-Weekly vs. Semi-Monthly: What is the difference?</h4>
+              <p className="text-slate-600 mt-1">
+                Bi-weekly means 26 paychecks per year (paid every 2 weeks). Semi-monthly means 24 paychecks per year (paid twice a month, usually the 15th and end of month).
+              </p>
+            </div>
+            <div className="p-4 border border-slate-200 rounded-xl bg-slate-50">
+              <h4 className="font-bold text-slate-900">Do 401(k) pre-tax contributions reduce FICA taxes?</h4>
+              <p className="text-slate-600 mt-1">
+                No. 401(k) contributions reduce Federal and State income taxes, but you still pay Social Security and Medicare (FICA).
+              </p>
+            </div>
+          </div>
+        </section>
+      </article>
     </div>
   );
 };
