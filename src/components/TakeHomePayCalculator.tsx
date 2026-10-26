@@ -572,42 +572,6 @@ export const TakeHomePayCalculator: React.FC<TakeHomePayCalculatorProps> = ({ on
         </section>
       </article>
     </div>
-    <div style="max-width: 1200px; margin: 40px auto; padding: 20px; font-family: sans-serif; color: #333; line-height: 1.6;">
-    
-    <h2 style="font-size: 28px; color: #1a365d; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px;">
-        Understanding Your Paycheck: How a Take-Home Pay Calculator Works
-    </h2>
-    
-    <p style="margin-bottom: 15px; font-size: 16px;">
-        When you accept a job offer with a specific annual salary, the amount you see on paper is rarely the amount that lands in your bank account. Your <strong>gross pay</strong> undergoes several financial deductions before becoming your actual <strong>net pay</strong> (or take-home pay). Using an online salary calculator helps you budget effectively by forecasting your exact earnings after all mandatory and voluntary deductions.
-    </p>
-
-    <h3 style="font-size: 22px; color: #2c5282; margin-top: 25px; margin-bottom: 10px;">
-        The Core Components of Salary Deductions
-    </h3>
-    <p style="margin-bottom: 15px; font-size: 16px;">
-        To accurately estimate your monthly or bi-weekly income, our free automated tool processes your financial parameters through standard tax regulations. Here is a breakdown of the primary factors that impact your final paycheck:
-    </p>
-    
-    <ul style="margin-left: 20px; margin-bottom: 20px; font-size: 16px;">
-        <li style="margin-bottom: 8px;"><strong>Federal Income Tax:</strong> Calculated based on the standard progressive tax brackets provided by the IRS, depending on your filing status (Single, Married, Head of Household).</li>
-        <li style="margin-bottom: 8px;"><strong>FICA Taxes:</strong> Mandatory federal payroll taxes that fund social programs. This includes Social Security (typically 6.2%) and Medicare (1.45%) deductions.</li>
-        <li style="margin-bottom: 8px;"><strong>State and Local Taxes:</strong> Depending on where you live and work, state income taxes or local municipality tax rates will apply to your gross income.</li>
-    </ul>
-
-    <h3 style="font-size: 22px; color: #2c5282; margin-top: 25px; margin-bottom: 10px;">
-        Pre-Tax vs. Post-Tax Deductions: What is the Difference?
-    </h3>
-    <p style="margin-bottom: 15px; font-size: 16px;">
-        One of the fastest ways to optimize your tax liability is by allocating funds into employer-sponsored accounts. <strong>Pre-tax deductions</strong>, such as traditional 401(k) retirement contributions or health insurance premiums, are subtracted from your gross earnings <em>before</em> income taxes are calculated. This lowers your taxable income baseline, saving you money during tax season. On the other hand, post-tax deductions are taken out after taxes have been finalized.
-    </p>
-
-    <h3 style="font-size: 22px; color: #2c5282; margin-top: 25px; margin-bottom: 10px;">
-        How to Use Our Take-Home Pay Tool for Financial Planning
-    </h3>
-    <p style="margin-bottom: 15px; font-size: 16px;">
-        Our interactive US financial tool is designed for precise personal finance planning. Simply input your annual gross wages, state location, hourly wage rates, and any specific retirement contributions or health coverage plans. The system will instantly compute your final disposable income, allowing you to accurately plan for rent, mortgages, and investments without any unexpected financial surprises.
-    </p>
     
 </div>
   );
