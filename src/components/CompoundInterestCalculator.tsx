@@ -227,6 +227,53 @@ export const CompoundInterestCalculator: React.FC<CompoundInterestCalculatorProp
             </div>
           </div>
         </div>
+      </div
+      <div className="mt-14 pt-10 border-t border-slate-200 text-slate-800 max-w-5xl mx-auto px-4">
+        <div className="mb-6">
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            Wealth Accumulation Guide • 2026 Edition
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-3">
+            The Power of Compound Interest: How Ordinary Investors Build Extraordinary Wealth
+          </h2>
+        </div>
+
+        {/* Key Takeaways */}
+        <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 mb-8">
+          <h3 className="text-sm font-bold text-emerald-950 uppercase tracking-wide mb-2">
+            Key Takeaways at a Glance
+          </h3>
+          <ul className="space-y-2 text-xs sm:text-sm text-emerald-900">
+            <li>• <strong>Exponential vs Linear Growth:</strong> A $10,000 starting deposit with $500 monthly contributions at an 8% return grows into <strong>$343,778 in 20 years</strong>—where <strong>$213,778 is 100% free compound interest</strong> (a 164% gain above your actual deposits).</li>
+            <li>• <strong>Dollar-Cost Averaging (DCA):</strong> Contributing monthly eliminates market timing guesswork, automatically accumulating more index fund shares during market dips.</li>
+            <li>• <strong>The Rule of 72:</strong> Divide 72 by your annual interest rate to find your portfolio doubling time (at 8%, your money doubles every 9 years: 72 ÷ 8 = 9).</li>
+            <li>• <strong>The Cost of Waiting:</strong> Delaying investing by just 10 years can cut your ultimate retirement wealth by more than half.</li>
+          </ul>
+        </div>
+
+        {/* Content Section */}
+        <div className="space-y-6 text-sm text-slate-700 leading-relaxed">
+          <h3 className="text-xl font-bold text-slate-900">
+            Simple vs. Compound Interest: The Snowball Effect
+          </h3>
+          <p>
+            While simple interest only grows linearly on your original principal, compound interest pays you returns on both your principal and all previously accumulated interest. In the early years, your $500 monthly deposits do most of the work. But as your balance expands, compounding takes over—generating more money annually while you sleep than your entire yearly salary contributions.
+          </p>
+
+          <h3 className="text-xl font-bold text-slate-900">
+            Frequently Asked Questions (FAQ)
+          </h3>
+          <div className="space-y-3 pt-2">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <h4 className="font-bold text-slate-900 text-sm">What is the historical average annual return of the S&amp;P 500?</h4>
+              <p className="mt-1 text-xs text-slate-600">Historically, the S&amp;P 500 index has generated an annualized nominal return of approximately 10.2% before inflation, and roughly 7.5% real return after inflation over 20+ year horizons.</p>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <h4 className="font-bold text-slate-900 text-sm">What is the Rule of 72 in compound interest?</h4>
+              <p className="mt-1 text-xs text-slate-600">The Rule of 72 is a quick mental math shortcut: divide 72 by your expected annual return to see how many years it takes for your investment to double (e.g. at 8%, 72 ÷ 8 = 9 years).</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
