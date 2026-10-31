@@ -243,6 +243,60 @@ export const PersonalLoanCalculator: React.FC<PersonalLoanCalculatorProps> = ({
           </div>
         </div>
       </div>
+      <div className="mt-12 pt-10 border-t border-slate-200 text-slate-800 max-w-5xl mx-auto px-4">
+        <div className="mb-6">
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+            Comprehensive Guide • 2026 US Rate Environment
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-3">
+            Personal Loans for Debt Consolidation: How to Slash Interest and Eliminate Credit Card Debt
+          </h2>
+        </div>
+
+        {/* Key Takeaways */}
+        <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 mb-8">
+          <h3 className="text-sm font-bold text-emerald-950 uppercase tracking-wide mb-2">
+            Key Takeaways at a Glance
+          </h3>
+          <ul className="space-y-2 text-xs sm:text-sm text-emerald-900">
+            <li>• <strong>Massive Interest Savings:</strong> Replacing an $18,000 credit card debt at 21.49% with a 9.99% fixed personal loan saves over <strong>$10,857 in interest</strong>.</li>
+            <li>• <strong>Guaranteed Debt Freedom Date:</strong> Enforces a strict 36, 48, or 60-month finish line, avoiding 15–20 years of revolving minimum payments.</li>
+            <li>• <strong>Credit Score Boost:</strong> Eliminates high revolving utilization, typically generating an immediate <strong>40 to 70+ point FICO score increase</strong> within 60 days.</li>
+            <li>• <strong>Origination Fee Transparency:</strong> Upfront fees (1% to 6%) are deducted from payout ($180 on $18k at 1%), but net savings remain overwhelmingly positive.</li>
+          </ul>
+        </div>
+
+        {/* Content Section */}
+        <div className="space-y-6 text-sm text-slate-700 leading-relaxed">
+          <h3 className="text-xl font-bold text-slate-900">
+            The Problem with Minimum Credit Card Payments: The Compound Interest Trap
+          </h3>
+          <p>
+            Credit card interest compounds daily at rates often exceeding 21.49% APR. When paying only minimums on an $18,000 balance, over $320 of your payment goes to interest alone every month, taking up to 20 years to fully repay while costing over $13,940 in interest charges.
+          </p>
+
+          <h3 className="text-xl font-bold text-slate-900">
+            How a Consolidation Personal Loan Breaks the Cycle
+          </h3>
+          <p>
+            A fixed-rate personal loan pays off your variable credit cards in full. Instead of multiple uncertain card payments, you have one fixed, predictable monthly installment with a guaranteed payoff date.
+          </p>
+
+          <h3 className="text-xl font-bold text-slate-900">
+            Frequently Asked Questions (FAQ)
+          </h3>
+          <div className="space-y-3 pt-2">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <h4 className="font-bold text-slate-900 text-sm">How does debt consolidation save money?</h4>
+              <p className="mt-1 text-xs text-slate-600">By cutting your interest rate from 21%+ down to single digits, ensuring more of each payment pays down principal instead of finance fees.</p>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <h4 className="font-bold text-slate-900 text-sm">Will consolidating debt hurt my credit score?</h4>
+              <p className="mt-1 text-xs text-slate-600">After a temporary 3–5 point dip from the hard inquiry, your credit score usually jumps 40 to 70+ points because your credit utilization ratio drops to near 0%.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
