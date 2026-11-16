@@ -1,3 +1,4 @@
+import { RetirementSeoArticle } from './components/RetirementSeoArticle';
 import React, { useState, useMemo } from 'react';
 import { PiggyBank, Sparkles, TrendingUp, Gift, Download } from 'lucide-react';
 import { Retirement401kInputs, Retirement401kResult } from '../types';
@@ -381,6 +382,7 @@ export const Retirement401kCalculator: React.FC<Retirement401kCalculatorProps> =
           </div>
         </div>
       </div>
+      <RetirementSeoArticle />
     </div>
   );
 };
