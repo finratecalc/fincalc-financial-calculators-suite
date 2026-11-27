@@ -227,7 +227,8 @@ export const CompoundInterestCalculator: React.FC<CompoundInterestCalculatorProp
             </div>
           </div>
         </div>
-      </div
+      </div>
+
       <div className="mt-14 pt-10 border-t border-slate-200 text-slate-800 max-w-5xl mx-auto px-4">
         <div className="mb-6">
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
