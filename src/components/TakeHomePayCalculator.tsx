@@ -1,4 +1,4 @@
-import { useState, useId } from 'react';
+import { useState, useId, useEffect } from 'react';
 import {
   ShieldCheck,
   RotateCcw,
@@ -15,42 +15,45 @@ import {
 type FilingStatus = 'single' | 'married' | 'head_of_household';
 type PayFrequency = 'annual' | 'monthly' | 'semi_monthly' | 'bi_weekly' | 'weekly' | 'hourly';
 
+// Verified 2026 IRS Standard Deductions
 const STANDARD_DEDUCTIONS: Record<FilingStatus, number> = {
-  single: 15000,
-  married: 30000,
-  head_of_household: 22500,
+  single: 16100,
+  married: 32200,
+  head_of_household: 24150,
 };
 
-const SOCIAL_SECURITY_WAGE_LIMIT = 168600;
+// Verified 2026 SSA Wage Base & FICA Rates
+const SOCIAL_SECURITY_WAGE_LIMIT = 184500;
 const SOCIAL_SECURITY_RATE = 0.062;
 const MEDICARE_RATE = 0.0145;
 
+// Verified 2026 IRS Federal Income Tax Brackets
 const FEDERAL_BRACKETS: Record<FilingStatus, { limit: number; rate: number }[]> = {
   single: [
-    { limit: 11925, rate: 0.10 },
-    { limit: 48475, rate: 0.12 },
-    { limit: 103350, rate: 0.22 },
-    { limit: 197300, rate: 0.24 },
-    { limit: 250525, rate: 0.32 },
-    { limit: 626350, rate: 0.35 },
+    { limit: 12400, rate: 0.10 },
+    { limit: 50400, rate: 0.12 },
+    { limit: 105700, rate: 0.22 },
+    { limit: 201775, rate: 0.24 },
+    { limit: 256225, rate: 0.32 },
+    { limit: 640600, rate: 0.35 },
     { limit: Infinity, rate: 0.37 },
   ],
   married: [
-    { limit: 23850, rate: 0.10 },
-    { limit: 96950, rate: 0.12 },
-    { limit: 206700, rate: 0.22 },
-    { limit: 394600, rate: 0.24 },
-    { limit: 501050, rate: 0.32 },
-    { limit: 751600, rate: 0.35 },
+    { limit: 24800, rate: 0.10 },
+    { limit: 100800, rate: 0.12 },
+    { limit: 211400, rate: 0.22 },
+    { limit: 403550, rate: 0.24 },
+    { limit: 512450, rate: 0.32 },
+    { limit: 768700, rate: 0.35 },
     { limit: Infinity, rate: 0.37 },
   ],
   head_of_household: [
-    { limit: 17000, rate: 0.10 },
-    { limit: 64850, rate: 0.12 },
-    { limit: 103350, rate: 0.22 },
-    { limit: 197300, rate: 0.24 },
-    { limit: 250500, rate: 0.32 },
-    { limit: 626350, rate: 0.35 },
+    { limit: 17700, rate: 0.10 },
+    { limit: 67450, rate: 0.12 },
+    { limit: 105700, rate: 0.22 },
+    { limit: 201750, rate: 0.24 },
+    { limit: 256200, rate: 0.32 },
+    { limit: 640600, rate: 0.35 },
     { limit: Infinity, rate: 0.37 },
   ],
 };
@@ -82,6 +85,29 @@ const STATE_PRESETS = [
 
 const SALARY_PRESETS = [45000, 65000, 85000, 120000, 160000, 220000];
 
+const TAKE_HOME_FAQS = [
+  {
+    q: 'What is the difference between gross pay and net take-home pay?',
+    a: 'Gross pay is your full annual salary or hourly earnings before anything is withheld. Net take-home pay is the actual dollar amount deposited into your checking account after subtracting 2026 federal income tax, FICA (Social Security and Medicare), state income tax, and benefits such as health insurance or 401(k) contributions.',
+  },
+  {
+    q: 'Why is my monthly paycheck much smaller than my salary divided by 12?',
+    a: 'Dividing an $85,000 salary by 12 gives $7,083 gross per month, but mandatory withholdings reduce that check right away. Between progressive federal tax, 7.65% FICA, state income tax (0% to ~13.3% depending on where you live), and health or retirement deductions, most US workers see 20% to 35% withheld before payday.',
+  },
+  {
+    q: 'Do 401(k) and HSA contributions reduce FICA taxes too?',
+    a: 'Traditional 401(k) contributions lower your federal and state taxable income, but they are still subject to Social Security and Medicare (FICA) taxes. By contrast, employer-sponsored Section 125 health premiums and payroll-deducted HSA or FSA contributions lower federal tax, state tax, AND FICA taxes.',
+  },
+  {
+    q: 'How does bi-weekly pay differ from semi-monthly pay?',
+    a: 'Bi-weekly payroll pays every two weeks for 26 paychecks a year, which gives you two "extra" three-paycheck months every calendar year. Semi-monthly payroll pays twice a month (usually the 15th and last day) for 24 slightly larger paychecks a year.',
+  },
+  {
+    q: 'What is the difference between marginal tax rate and effective tax rate?',
+    a: 'Your marginal tax rate is the IRS bracket applied only to your top slice of taxable income (for example, 22%). Your effective tax rate is the actual percentage of your total gross pay going to taxes, which is always lower because the 2026 standard deduction ($16,100 single / $32,200 married) and the 10% and 12% brackets protect your first dollars earned.',
+  },
+];
+
 export function TakeHomePayCalculator(_props?: any) {
   const annualSalaryInputId = useId();
   const hourlyRateInputId = useId();
@@ -112,24 +138,130 @@ export function TakeHomePayCalculator(_props?: any) {
   const [activeFrequency, setActiveFrequency] = useState<PayFrequency>('monthly');
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
   const [copiedSummary, setCopiedSummary] = useState<boolean>(false);
-  const [copiedMd, setCopiedMd] = useState<boolean>(false);
   const [faqSearch, setFaqSearch] = useState<string>('');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
 
-  const effectiveGross = wageType === 'salary' ? grossAnnual : Math.round(hourlyRate * hoursPerWeek * 52);
+  useEffect(() => {
+    const scriptId = 'finrate-paycheck-jsonld';
+    let scriptEl = document.getElementById(scriptId) as HTMLScriptElement | null;
+    if (!scriptEl) {
+      scriptEl = document.createElement('script');
+      scriptEl.id = scriptId;
+      scriptEl.type = 'application/ld+json';
+      document.head.appendChild(scriptEl);
+    }
+
+    const richSchema = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Home',
+              item: 'https://finratecalc.com/',
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: 'US Take-Home Pay Calculator',
+              item: 'https://finratecalc.com/take-home-pay-calculator',
+            },
+          ],
+        },
+        {
+          '@type': 'HowTo',
+          name: 'How to Estimate Your 2026 US Net Paycheck After Taxes',
+          description:
+            'Calculate your US take-home salary or hourly paycheck using 2026 IRS tax brackets, standard deductions, FICA Social Security cap, state tax, and 401(k)/HSA shields.',
+          totalTime: 'PT2M',
+          step: [
+            {
+              '@type': 'HowToStep',
+              position: 1,
+              name: 'Enter Annual Salary or Hourly Wage',
+              text: 'Choose Annual Salary or Hourly Wage and enter your gross pay before taxes.',
+            },
+            {
+              '@type': 'HowToStep',
+              position: 2,
+              name: 'Select Your 2026 IRS Filing Status',
+              text: 'Pick Single ($16,100 standard deduction), Married Filing Jointly ($32,200), or Head of Household ($24,150).',
+            },
+            {
+              '@type': 'HowToStep',
+              position: 3,
+              name: 'Set Your State Income Tax Rate',
+              text: 'Select a no-tax state (TX, FL, WA at 0%) or adjust the slider to match your state effective tax rate.',
+            },
+            {
+              '@type': 'HowToStep',
+              position: 4,
+              name: 'Add Pre-Tax 401(k), Health Insurance, and HSA Deductions',
+              text: 'Enter pre-tax retirement and Section 125 benefit amounts to lower your federal and state taxable income.',
+            },
+            {
+              '@type': 'HowToStep',
+              position: 5,
+              name: 'Switch Paycheck Frequency',
+              text: 'Toggle between Monthly, Bi-Weekly (26 checks), Semi-Monthly (24 checks), Weekly, Annual, or Hourly net pay.',
+            },
+          ],
+        },
+        {
+          '@type': 'Article',
+          headline:
+            '2026 US Take-Home Pay Guide: Federal Brackets, FICA Caps, State Taxes & Pre-Tax Paycheck Shields',
+          description:
+            'Human-written US payroll breakdown explaining how 2026 IRS brackets, the $184,500 Social Security cap, state income taxes, and 401(k)/HSA deductions shape your real direct deposit.',
+          author: {
+            '@type': 'Organization',
+            name: 'FinRateCalc Editorial Team',
+            url: 'https://finratecalc.com',
+          },
+          publisher: {
+            '@type': 'Organization',
+            name: 'FinRateCalc',
+            url: 'https://finratecalc.com',
+          },
+          datePublished: '2026-01-15',
+          dateModified: '2026-11-27',
+          mainEntityOfPage: 'https://finratecalc.com/take-home-pay-calculator',
+        },
+      ],
+    };
+
+    scriptEl.textContent = JSON.stringify(richSchema);
+
+    return () => {
+      const existing = document.getElementById(scriptId);
+      if (existing) existing.remove();
+    };
+  }, []);
+
+  const effectiveGross =
+    wageType === 'salary' ? grossAnnual : Math.round(hourlyRate * hoursPerWeek * 52);
 
   const retirement401k = (effectiveGross * retirement401kPercent) / 100;
-  const totalPreTax = Math.round((retirement401k + healthInsuranceAnnual + hsaFsaAnnual) * 100) / 100;
+  const totalPreTax =
+    Math.round((retirement401k + healthInsuranceAnnual + hsaFsaAnnual) * 100) / 100;
 
   const ficaBase = Math.max(0, effectiveGross - (healthInsuranceAnnual + hsaFsaAnnual));
   const ssTaxable = Math.min(ficaBase, SOCIAL_SECURITY_WAGE_LIMIT);
   const socialSecurity = Math.round(ssTaxable * SOCIAL_SECURITY_RATE * 100) / 100;
   const medicare = Math.round(ficaBase * MEDICARE_RATE * 100) / 100;
   const additionalThreshold = filingStatus === 'married' ? 250000 : 200000;
-  const additionalMedicare = ficaBase > additionalThreshold ? Math.round((ficaBase - additionalThreshold) * 0.009 * 100) / 100 : 0;
+  const additionalMedicare =
+    ficaBase > additionalThreshold
+      ? Math.round((ficaBase - additionalThreshold) * 0.009 * 100) / 100
+      : 0;
   const totalFica = Math.round((socialSecurity + medicare + additionalMedicare) * 100) / 100;
 
-  const stdDed = useStandardDeduction ? STANDARD_DEDUCTIONS[filingStatus] : customItemizedDeduction;
+  const stdDed = useStandardDeduction
+    ? STANDARD_DEDUCTIONS[filingStatus]
+    : customItemizedDeduction;
   const federalTaxable = Math.max(0, effectiveGross - totalPreTax - stdDed);
 
   let federalTax = 0;
@@ -152,8 +284,10 @@ export function TakeHomePayCalculator(_props?: any) {
   const totalAllDeductions = Math.round((totalTaxes + totalPreTax + roth401kAnnual) * 100) / 100;
   const netAnnual = Math.max(0, Math.round((effectiveGross - totalAllDeductions) * 100) / 100);
 
-  const effectiveTaxRate = effectiveGross > 0 ? Math.round((totalTaxes / effectiveGross) * 1000) / 10 : 0;
-  const takeHomePercent = effectiveGross > 0 ? Math.round((netAnnual / effectiveGross) * 1000) / 10 : 0;
+  const effectiveTaxRate =
+    effectiveGross > 0 ? Math.round((totalTaxes / effectiveGross) * 1000) / 10 : 0;
+  const takeHomePercent =
+    effectiveGross > 0 ? Math.round((netAnnual / effectiveGross) * 1000) / 10 : 0;
 
   const divisor = FREQ_DIVISORS[activeFrequency];
   const periodGross = effectiveGross / divisor;
@@ -172,7 +306,7 @@ export function TakeHomePayCalculator(_props?: any) {
   const preTaxBarWidth = effectiveGross > 0 ? (totalPreTax / effectiveGross) * 100 : 0;
 
   const handleCopySummary = () => {
-    const text = `FinRateCalc Paycheck Breakdown:
+    const text = `FinRateCalc 2026 Paycheck Breakdown:
 Gross Salary: ${formatCurrency(effectiveGross)}/yr
 Net Take-Home Pay (${activeFrequency}): ${formatCurrency(periodNet, true)}
 Annual Take-Home: ${formatCurrency(netAnnual)}
@@ -188,56 +322,10 @@ Calculated on: finratecalc.com`;
     setTimeout(() => setCopiedSummary(false), 2000);
   };
 
-  const handleCopyMarkdown = () => {
-    const md = `# Take-Home Pay Calculator & Net Salary Guide
-## How to Calculate Your Real Paycheck After Taxes and Deductions (2026 Edition)
-
-When an employer offers you an annual salary of $75,000, your gross monthly pay is $6,250. However, after taxes and deductions, your actual net direct deposit is closer to $4,650.
-
-### The Master Payroll Formula
-Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax + FICA Taxes + Post-Tax Deductions)
-
-### 1. Pre-Tax Deductions (Tax Shield)
-- Traditional 401(k) / 403(b): Reduces federal and state income taxes.
-- Section 125 Healthcare: Reduces federal tax, state tax, AND FICA taxes.
-- HSA / FSA: Triple-tax advantaged contributions.
-
-### 2. Mandatory Taxes
-- Federal Progressive Brackets: 10%, 12%, 22%, 24%, 32%, 35%, 37%.
-- Social Security (OASDI): 6.2% up to $168,600 wage limit.
-- Medicare: 1.45% uncapped (+0.9% additional on income >$200k).
-- State Income Taxes: 0% (TX, FL, WA) to ~13.3% (CA).
-`;
-    navigator.clipboard.writeText(md);
-    setCopiedMd(true);
-    setTimeout(() => setCopiedMd(false), 2000);
-  };
-
-  const FAQS = [
-    {
-      q: 'What is the difference between gross pay and net take-home pay?',
-      a: 'Gross pay is your agreed baseline earnings before any taxes or deductions. Net take-home pay is the final sum deposited into your bank account after subtracting federal and state income taxes, FICA (Social Security and Medicare), and company benefits.',
-    },
-    {
-      q: 'Why is my take-home pay significantly less than my gross salary divided by 12?',
-      a: 'Your gross salary does not account for compulsory withholdings: Federal income tax (10% to 37%), FICA taxes (7.65%), state taxes (0% to 13%), and company deductions (health insurance and 401k). Combined, these typically reduce your paycheck by 20% to 38%.',
-    },
-    {
-      q: 'Do 401(k) contributions reduce all my taxes?',
-      a: 'Traditional 401(k) contributions reduce your federal and state taxable income, which lowers your income tax. However, 401(k) contributions are still subject to FICA taxes (Social Security and Medicare). In contrast, Section 125 health insurance and HSA contributions reduce federal tax, state tax, AND FICA taxes.',
-    },
-    {
-      q: 'How does bi-weekly pay differ from semi-monthly pay?',
-      a: 'Bi-weekly employees receive 26 paychecks per year (every two weeks), meaning two months per year contain three paychecks. Semi-monthly employees receive 24 paychecks per year (typically on the 15th and last day of each month).',
-    },
-    {
-      q: 'What is the difference between marginal tax rate and effective tax rate?',
-      a: 'Your marginal tax rate is the highest bracket applied to your top dollar of income. Your effective tax rate is your actual blended rate: total taxes paid divided by total gross salary. Your effective rate is always lower due to the standard deduction and progressive tax brackets.',
-    },
-  ];
-
-  const filteredFaqs = FAQS.filter(
-    (f) => f.q.toLowerCase().includes(faqSearch.toLowerCase()) || f.a.toLowerCase().includes(faqSearch.toLowerCase())
+  const filteredFaqs = TAKE_HOME_FAQS.filter(
+    (f) =>
+      f.q.toLowerCase().includes(faqSearch.toLowerCase()) ||
+      f.a.toLowerCase().includes(faqSearch.toLowerCase())
   );
 
   return (
@@ -247,18 +335,19 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
           <div>
             <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 uppercase tracking-wider">
               <ShieldCheck className="w-4 h-4" />
-              <span>2026 IRS Tax Year Standard & Brackets Grounded</span>
+              <span>2026 IRS Tax Year Standard &amp; Brackets Grounded</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
-              Interactive Take-Home Pay Calculator
-            </h2>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1 tracking-tight">
+              US Take-Home Pay &amp; Net Salary Calculator (2026)
+            </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Estimate your exact paycheck take-home pay after federal, state, FICA taxes, and 401(k) deductions.
+              Estimate your exact paycheck take-home pay after 2026 federal, state, FICA taxes, and 401(k)/HSA deductions.
             </p>
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-center">
             <button
+              type="button"
               onClick={() => {
                 setWageType('salary');
                 setGrossAnnual(85000);
@@ -268,6 +357,8 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                 setRetirement401kPercent(5);
                 setHealthInsuranceAnnual(2400);
                 setHsaFsaAnnual(1000);
+                setRoth401kAnnual(0);
+                setUseStandardDeduction(true);
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 rounded-lg transition-colors"
             >
@@ -275,10 +366,15 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
               <span>Reset</span>
             </button>
             <button
+              type="button"
               onClick={handleCopySummary}
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors shadow-xs"
             >
-              {copiedSummary ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedSummary ? (
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
               <span>{copiedSummary ? 'Copied!' : 'Copy Summary'}</span>
             </button>
           </div>
@@ -296,7 +392,9 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                     type="button"
                     onClick={() => setWageType('salary')}
                     className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                      wageType === 'salary' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                      wageType === 'salary'
+                        ? 'bg-white text-slate-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     Annual Salary
@@ -305,7 +403,9 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                     type="button"
                     onClick={() => setWageType('hourly')}
                     className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                      wageType === 'hourly' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                      wageType === 'hourly'
+                        ? 'bg-white text-slate-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     Hourly Wage
@@ -316,7 +416,9 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
               {wageType === 'salary' ? (
                 <div className="space-y-2">
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-medium">
+                      $
+                    </span>
                     <input
                       id={annualSalaryInputId}
                       type="number"
@@ -349,11 +451,16 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor={hourlyRateInputId} className="block text-xs font-medium text-slate-600 mb-1">
+                    <label
+                      htmlFor={hourlyRateInputId}
+                      className="block text-xs font-medium text-slate-600 mb-1"
+                    >
                       Hourly Pay Rate ($/hr)
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-medium">$</span>
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-medium">
+                        $
+                      </span>
                       <input
                         id={hourlyRateInputId}
                         type="number"
@@ -366,7 +473,10 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                     </div>
                   </div>
                   <div>
-                    <label htmlFor={hoursPerWeekInputId} className="block text-xs font-medium text-slate-600 mb-1">
+                    <label
+                      htmlFor={hoursPerWeekInputId}
+                      className="block text-xs font-medium text-slate-600 mb-1"
+                    >
                       Hours Worked Per Week
                     </label>
                     <input
@@ -385,13 +495,17 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 tracking-wide mb-2">
-                Tax Filing Status
+                Tax Filing Status (2026 IRS Standard Deduction)
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
                   { id: 'single', label: 'Single', ded: STANDARD_DEDUCTIONS.single },
                   { id: 'married', label: 'Married Joint', ded: STANDARD_DEDUCTIONS.married },
-                  { id: 'head_of_household', label: 'Head of Household', ded: STANDARD_DEDUCTIONS.head_of_household },
+                  {
+                    id: 'head_of_household',
+                    label: 'Head of Household',
+                    ded: STANDARD_DEDUCTIONS.head_of_household,
+                  },
                 ].map((s) => (
                   <button
                     key={s.id}
@@ -414,7 +528,10 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label htmlFor={stateRateInputId} className="text-xs font-semibold text-slate-700 tracking-wide">
+                <label
+                  htmlFor={stateRateInputId}
+                  className="text-xs font-semibold text-slate-700 tracking-wide"
+                >
                   State Income Tax Rate
                 </label>
                 <span className="text-xs text-slate-500 tabular-nums">
@@ -467,7 +584,9 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                     }}
                     className="w-full pr-6 pl-2.5 py-1.5 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg tabular-nums"
                   />
-                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">%</span>
+                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+                    %
+                  </span>
                 </div>
               </div>
             </div>
@@ -475,7 +594,7 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
             <div className="pt-2 border-t border-slate-100">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-semibold text-slate-700 tracking-wide">
-                  Pre-Tax Deductions (Lowers Federal & State Taxes)
+                  Pre-Tax Deductions (Lowers Federal &amp; State Taxes)
                 </span>
                 <span className="text-xs text-emerald-700 font-medium tabular-nums">
                   Total: -{formatCurrency(totalPreTax)}/yr
@@ -484,10 +603,15 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label htmlFor={retirementPercentInputId} className="text-xs font-medium text-slate-700">
+                    <label
+                      htmlFor={retirementPercentInputId}
+                      className="text-xs font-medium text-slate-700"
+                    >
                       401(k)
                     </label>
-                    <span className="text-xs text-emerald-700 font-semibold tabular-nums">{retirement401kPercent}%</span>
+                    <span className="text-xs text-emerald-700 font-semibold tabular-nums">
+                      {retirement401kPercent}%
+                    </span>
                   </div>
                   <input
                     id={retirementPercentInputId}
@@ -495,18 +619,27 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                     min="0"
                     max="50"
                     value={retirement401kPercent}
-                    onChange={(e) => setRetirement401kPercent(Math.max(0, Number(e.target.value)))}
+                    onChange={(e) =>
+                      setRetirement401kPercent(Math.max(0, Number(e.target.value)))
+                    }
                     className="w-full px-2.5 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg tabular-nums"
                   />
-                  <p className="text-[11px] text-slate-500 tabular-nums">={formatCurrency(retirement401k)}/yr</p>
+                  <p className="text-[11px] text-slate-500 tabular-nums">
+                    ={formatCurrency(retirement401k)}/yr
+                  </p>
                 </div>
 
                 <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label htmlFor={healthInsuranceInputId} className="text-xs font-medium text-slate-700">
+                    <label
+                      htmlFor={healthInsuranceInputId}
+                      className="text-xs font-medium text-slate-700"
+                    >
                       Health Ins.
                     </label>
-                    <span className="text-xs text-slate-500 tabular-nums">{formatCurrency(healthInsuranceAnnual / 12)}/mo</span>
+                    <span className="text-xs text-slate-500 tabular-nums">
+                      {formatCurrency(healthInsuranceAnnual / 12)}/mo
+                    </span>
                   </div>
                   <input
                     id={healthInsuranceInputId}
@@ -514,7 +647,9 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                     min="0"
                     step="50"
                     value={healthInsuranceAnnual}
-                    onChange={(e) => setHealthInsuranceAnnual(Math.max(0, Number(e.target.value)))}
+                    onChange={(e) =>
+                      setHealthInsuranceAnnual(Math.max(0, Number(e.target.value)))
+                    }
                     className="w-full px-2.5 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg tabular-nums"
                   />
                   <p className="text-[11px] text-slate-500">Section 125</p>
@@ -525,7 +660,9 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                     <label htmlFor={hsaFsaInputId} className="text-xs font-medium text-slate-700">
                       HSA / FSA
                     </label>
-                    <span className="text-xs text-slate-500 tabular-nums">{formatCurrency(hsaFsaAnnual / 12)}/mo</span>
+                    <span className="text-xs text-slate-500 tabular-nums">
+                      {formatCurrency(hsaFsaAnnual / 12)}/mo
+                    </span>
                   </div>
                   <input
                     id={hsaFsaInputId}
@@ -547,14 +684,25 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                 onClick={() => setShowAdvanced(!showAdvanced)}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 py-1 transition-colors"
               >
-                {showAdvanced ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                <span>{showAdvanced ? 'Hide Advanced Options' : 'Show Advanced (Roth 401k & Itemized Deductions)'}</span>
+                {showAdvanced ? (
+                  <ChevronUp className="w-3.5 h-3.5" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5" />
+                )}
+                <span>
+                  {showAdvanced
+                    ? 'Hide Advanced Options'
+                    : 'Show Advanced (Roth 401k & Itemized Deductions)'}
+                </span>
               </button>
 
               {showAdvanced && (
                 <div className="mt-3 p-4 bg-slate-50/70 border border-slate-200/80 rounded-xl grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor={roth401kInputId} className="block text-xs font-medium text-slate-700 mb-1">
+                    <label
+                      htmlFor={roth401kInputId}
+                      className="block text-xs font-medium text-slate-700 mb-1"
+                    >
                       Roth 401(k) / Post-Tax ($/yr)
                     </label>
                     <input
@@ -588,7 +736,9 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                         type="number"
                         min="0"
                         value={customItemizedDeduction}
-                        onChange={(e) => setCustomItemizedDeduction(Math.max(0, Number(e.target.value)))}
+                        onChange={(e) =>
+                          setCustomItemizedDeduction(Math.max(0, Number(e.target.value)))
+                        }
                         className="w-full px-3 py-1.5 text-xs font-semibold bg-white border border-slate-200 rounded-lg tabular-nums"
                       />
                     )}
@@ -601,9 +751,12 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
           <div className="lg:col-span-5 p-6 sm:p-8 bg-slate-50/40 flex flex-col justify-between space-y-6">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Paycheck View</span>
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Paycheck View
+                </span>
                 <span className="text-xs text-slate-600 font-medium">
-                  Effective Tax: <strong className="text-slate-900 tabular-nums">{effectiveTaxRate}%</strong>
+                  Effective Tax:{' '}
+                  <strong className="text-slate-900 tabular-nums">{effectiveTaxRate}%</strong>
                 </span>
               </div>
 
@@ -621,7 +774,9 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                     type="button"
                     onClick={() => setActiveFrequency(tab.id as PayFrequency)}
                     className={`py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                      activeFrequency === tab.id ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                      activeFrequency === tab.id
+                        ? 'bg-white text-slate-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     {tab.label}
@@ -631,7 +786,9 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
 
               <div className="p-5 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 rounded-2xl text-white shadow-md">
                 <div className="flex items-center justify-between text-xs text-emerald-300 font-medium mb-1">
-                  <span className="capitalize">{activeFrequency.replace('_', ' ')} Take-Home Pay</span>
+                  <span className="capitalize">
+                    {activeFrequency.replace('_', ' ')} Take-Home Pay
+                  </span>
                   <span className="tabular-nums font-semibold bg-emerald-900/60 text-emerald-200 px-2 py-0.5 rounded-md border border-emerald-700/40">
                     {takeHomePercent}% of gross
                   </span>
@@ -640,8 +797,18 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                   {formatCurrency(periodNet, true)}
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-300">
-                  <span>Gross: <strong className="text-white tabular-nums">{formatCurrency(periodGross, true)}</strong></span>
-                  <span>Deductions: <strong className="text-rose-300 tabular-nums">-{formatCurrency(periodTotalDeductions, true)}</strong></span>
+                  <span>
+                    Gross:{' '}
+                    <strong className="text-white tabular-nums">
+                      {formatCurrency(periodGross, true)}
+                    </strong>
+                  </span>
+                  <span>
+                    Deductions:{' '}
+                    <strong className="text-rose-300 tabular-nums">
+                      -{formatCurrency(periodTotalDeductions, true)}
+                    </strong>
+                  </span>
                 </div>
               </div>
 
@@ -651,18 +818,48 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                   <span className="tabular-nums text-slate-700">100% of Gross</span>
                 </div>
                 <div className="h-4 w-full bg-slate-200 rounded-full overflow-hidden flex shadow-inner">
-                  <div style={{ width: `${Math.max(2, netBarWidth)}%` }} className="bg-emerald-500 transition-all" />
-                  <div style={{ width: `${Math.max(1, fedBarWidth)}%` }} className="bg-slate-700 transition-all" />
-                  <div style={{ width: `${Math.max(1, stateBarWidth)}%` }} className="bg-indigo-600 transition-all" />
-                  <div style={{ width: `${Math.max(1, ficaBarWidth)}%` }} className="bg-amber-500 transition-all" />
-                  <div style={{ width: `${Math.max(1, preTaxBarWidth)}%` }} className="bg-cyan-600 transition-all" />
+                  <div
+                    style={{ width: `${Math.max(2, netBarWidth)}%` }}
+                    className="bg-emerald-500 transition-all"
+                  />
+                  <div
+                    style={{ width: `${Math.max(1, fedBarWidth)}%` }}
+                    className="bg-slate-700 transition-all"
+                  />
+                  <div
+                    style={{ width: `${Math.max(1, stateBarWidth)}%` }}
+                    className="bg-indigo-600 transition-all"
+                  />
+                  <div
+                    style={{ width: `${Math.max(1, ficaBarWidth)}%` }}
+                    className="bg-amber-500 transition-all"
+                  />
+                  <div
+                    style={{ width: `${Math.max(1, preTaxBarWidth)}%` }}
+                    className="bg-cyan-600 transition-all"
+                  />
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 text-[11px] text-slate-600 font-medium">
-                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" /><span>Net ({netBarWidth.toFixed(0)}%)</span></div>
-                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-700 shrink-0" /><span>Fed ({fedBarWidth.toFixed(0)}%)</span></div>
-                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-indigo-600 shrink-0" /><span>State ({stateBarWidth.toFixed(0)}%)</span></div>
-                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" /><span>FICA ({ficaBarWidth.toFixed(0)}%)</span></div>
-                  <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-cyan-600 shrink-0" /><span>Pre-Tax ({preTaxBarWidth.toFixed(0)}%)</span></div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                    <span>Net ({netBarWidth.toFixed(0)}%)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-700 shrink-0" />
+                    <span>Fed ({fedBarWidth.toFixed(0)}%)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-indigo-600 shrink-0" />
+                    <span>State ({stateBarWidth.toFixed(0)}%)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
+                    <span>FICA ({ficaBarWidth.toFixed(0)}%)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-cyan-600 shrink-0" />
+                    <span>Pre-Tax ({preTaxBarWidth.toFixed(0)}%)</span>
+                  </div>
                 </div>
               </div>
 
@@ -674,34 +871,61 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                 <div className="divide-y divide-slate-100 text-xs">
                   <div className="px-3.5 py-2 flex items-center justify-between">
                     <span className="text-slate-600">Federal Income Tax</span>
-                    <span className="font-semibold text-slate-900 tabular-nums">-{formatCurrency(periodFederal, true)} <span className="text-slate-500 font-normal">({formatCurrency(federalTax)})</span></span>
+                    <span className="font-semibold text-slate-900 tabular-nums">
+                      -{formatCurrency(periodFederal, true)}{' '}
+                      <span className="text-slate-500 font-normal">
+                        ({formatCurrency(federalTax)})
+                      </span>
+                    </span>
                   </div>
                   <div className="px-3.5 py-2 flex items-center justify-between">
                     <span className="text-slate-600">State Tax ({customStateRate}%)</span>
-                    <span className="font-semibold text-slate-900 tabular-nums">-{formatCurrency(periodState, true)} <span className="text-slate-500 font-normal">({formatCurrency(stateTax)})</span></span>
+                    <span className="font-semibold text-slate-900 tabular-nums">
+                      -{formatCurrency(periodState, true)}{' '}
+                      <span className="text-slate-500 font-normal">
+                        ({formatCurrency(stateTax)})
+                      </span>
+                    </span>
                   </div>
                   <div className="px-3.5 py-2 flex items-center justify-between">
                     <span className="text-slate-600">Social Security (6.2%)</span>
-                    <span className="font-semibold text-slate-900 tabular-nums">-{formatCurrency(periodSS, true)} <span className="text-slate-500 font-normal">({formatCurrency(socialSecurity)})</span></span>
+                    <span className="font-semibold text-slate-900 tabular-nums">
+                      -{formatCurrency(periodSS, true)}{' '}
+                      <span className="text-slate-500 font-normal">
+                        ({formatCurrency(socialSecurity)})
+                      </span>
+                    </span>
                   </div>
                   <div className="px-3.5 py-2 flex items-center justify-between">
                     <span className="text-slate-600">Medicare (1.45%)</span>
-                    <span className="font-semibold text-slate-900 tabular-nums">-{formatCurrency(periodMed, true)} <span className="text-slate-500 font-normal">({formatCurrency(medicare + additionalMedicare)})</span></span>
+                    <span className="font-semibold text-slate-900 tabular-nums">
+                      -{formatCurrency(periodMed, true)}{' '}
+                      <span className="text-slate-500 font-normal">
+                        ({formatCurrency(medicare + additionalMedicare)})
+                      </span>
+                    </span>
                   </div>
                   <div className="px-3.5 py-2 flex items-center justify-between bg-slate-50/50">
-                    <span className="text-slate-600">Pre-Tax 401(k) & HSA</span>
-                    <span className="font-semibold text-emerald-800 tabular-nums">-{formatCurrency(periodPreTax, true)} <span className="text-slate-500 font-normal">({formatCurrency(totalPreTax)})</span></span>
+                    <span className="text-slate-600">Pre-Tax 401(k) &amp; HSA</span>
+                    <span className="font-semibold text-emerald-800 tabular-nums">
+                      -{formatCurrency(periodPreTax, true)}{' '}
+                      <span className="text-slate-500 font-normal">
+                        ({formatCurrency(totalPreTax)})
+                      </span>
+                    </span>
                   </div>
                   <div className="px-3.5 py-2.5 flex items-center justify-between bg-emerald-50/50 font-semibold text-slate-900">
                     <span>Net Take-Home Pay</span>
-                    <span className="text-emerald-700 font-bold tabular-nums text-sm">{formatCurrency(periodNet, true)}</span>
+                    <span className="text-emerald-700 font-bold tabular-nums text-sm">
+                      {formatCurrency(periodNet, true)}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="text-[11px] text-slate-500 text-center pt-2">
-              IRS 2026 tax standards. Calculations do not constitute certified tax advice.
+              Grounded in IRS 2026 tax brackets and SSA wage limits. Estimates are for planning purposes only.
             </div>
           </div>
         </div>
@@ -710,81 +934,86 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
       <article className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-10 shadow-sm space-y-10">
         <header className="border-b border-slate-200/80 pb-6 space-y-3">
           <div className="flex items-center flex-wrap gap-2 text-xs text-slate-500 font-medium">
-            <span className="text-emerald-700 font-semibold">finratecalc.com / Take Home Pay</span>
-            <span aria-hidden="true">·</span>
-            <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Updated January 2026</span>
-            <span aria-hidden="true">·</span>
-            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> 8 min read</span>
-            <span aria-hidden="true">·</span>
-            <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> FinRateCalc Editorial Team</span>
+            <span className="text-emerald-700 font-semibold">finratecalc.com / Take-Home Pay Guide</span>
+            <span aria-hidden="true">&middot;</span>
+            <span className="flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5" /> Updated for 2026 IRS Rules
+            </span>
+            <span aria-hidden="true">&middot;</span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" /> 7 min read
+            </span>
+            <span aria-hidden="true">&middot;</span>
+            <span className="flex items-center gap-1">
+              <User className="w-3.5 h-3.5" /> FinRateCalc Editorial Team
+            </span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-            Take-Home Pay Calculator & Net Salary Guide: How to Calculate Your Real Paycheck After Taxes and Deductions
-          </h1>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            How Your 2026 US Paycheck Is Calculated: Federal Brackets, FICA Caps, State Taxes &amp; Pre-Tax Shields
+          </h2>
 
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl">
-            A comprehensive, mathematical walkthrough of gross vs. net pay, progressive federal tax brackets, state withholdings, FICA Social Security and Medicare taxes, and Section 125 pre-tax shields.
+            Accepting an $85,000 job offer looks like $7,083 a month on paper, yet your bank deposit after taxes and benefits often lands closer to $5,100 in a moderate-tax state or $5,500 in Texas or Florida. Understanding where each dollar goes helps you budget accurately and keep more of your raise.
           </p>
-
-          <div className="pt-2 flex items-center gap-2">
-            <button
-              onClick={handleCopyMarkdown}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors"
-            >
-              {copiedMd ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedMd ? 'Markdown Copied!' : 'Copy Article Markdown'}</span>
-            </button>
-          </div>
         </header>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-slate-900">1. The Master Paycheck Equation</h2>
+          <h3 className="text-xl font-bold text-slate-900">
+            1. Gross Salary vs. Net Direct Deposit: Why Location Changes Everything
+          </h3>
           <p className="text-sm text-slate-600 leading-relaxed">
-            When you sign an employment agreement for a <strong>$75,000 annual salary</strong>, dividing it by 12 gives an expected <strong>$6,250 per month</strong>. However, upon checking your pay stub, the actual direct deposit is typically closer to <strong>$4,400 to $4,650</strong>. 
+            Two US employees earning the exact same <strong>$85,000 salary</strong> with identical 5% 401(k) contributions and $2,400/year health premiums can walk away with very different paychecks depending on state income tax. In <strong>Texas, Florida, Tennessee, Nevada, or Washington</strong> (0% state income tax), a single filer takes home roughly <strong>$64,500/year</strong>. In a higher-tax state such as California or New York, state withholding trims another $3,500 to $4,500 a year from that same salary.
           </p>
           <div className="p-4 bg-slate-900 text-white rounded-xl font-mono text-xs leading-relaxed border border-slate-800">
-            Net Take-Home Pay = Gross Pay - (Pre-Tax Deductions + Federal Tax + State Tax + FICA Taxes + Post-Tax Deductions)
+            Net Paycheck = Gross Pay &minus; (Pre-Tax 401(k)/HSA/Health + Federal Tax + State Tax + FICA + Post-Tax Deductions)
           </div>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-slate-900">2. Pre-Tax Deductions: Your Best Defense Against High Taxes</h2>
+          <h3 className="text-xl font-bold text-slate-900">
+            2. Using 2026 Pre-Tax Deductions to Shrink Your Tax Bill
+          </h3>
           <p className="text-sm text-slate-600 leading-relaxed">
-            Pre-tax deductions are subtracted directly from gross earnings <strong>before</strong> income taxes are computed. This lowers your taxable income base, meaning every dollar contributed saves you money at your highest marginal tax bracket:
+            Pre-tax payroll elections come out of your check <strong>before</strong> federal (and usually state) income tax is calculated. Every dollar placed into a Traditional 401(k) or HSA saves you money at your highest marginal bracket:
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
-              <div className="text-xs font-bold text-slate-900">Traditional 401(k) / 403(b)</div>
+              <div className="text-xs font-bold text-slate-900">Traditional 401(k) ($24,500 Cap)</div>
               <p className="text-xs text-slate-600 leading-normal">
-                Reduces federal and state income tax base. For a 22% bracket earner, a $100 contribution only reduces take-home pay by roughly $78.
+                For 2026, workers can defer up to <strong>$24,500</strong> ($32,500 at age 50+). In the 22% federal bracket, a $100 contribution lowers take-home pay by roughly $78 (plus state savings).
               </p>
             </div>
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
-              <div className="text-xs font-bold text-slate-900">Section 125 Healthcare</div>
+              <div className="text-xs font-bold text-slate-900">Section 125 Health Premiums</div>
               <p className="text-xs text-slate-600 leading-normal">
-                Health, dental, and vision premiums paid through cafeteria plans are exempt from federal tax, state tax, and both FICA taxes.
+                Employer medical, dental, and vision premiums skip federal income tax, state tax, <strong>and</strong> both 7.65% FICA payroll taxes.
               </p>
             </div>
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
-              <div className="text-xs font-bold text-slate-900">HSA / FSA Accounts</div>
+              <div className="text-xs font-bold text-slate-900">HSA ($4,400 / $8,750 Caps)</div>
               <p className="text-xs text-slate-600 leading-normal">
-                Health Savings Accounts provide triple-tax benefits: tax-deductible deposits, tax-free investment growth, and tax-free withdrawals for healthcare.
+                In 2026, HDHP enrollees can contribute up to <strong>$4,400</strong> (self-only) or <strong>$8,750</strong> (family) payroll-tax-free, with tax-free medical withdrawals.
               </p>
             </div>
           </div>
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-slate-900">3. Mandatory Government Taxes (Federal, FICA & State)</h2>
-          <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
+          <h3 className="text-xl font-bold text-slate-900">
+            3. Mandatory 2026 US Payroll Taxes (Federal, FICA &amp; State)
+          </h3>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            The IRS uses a <strong>progressive bracket system</strong>, plus a flat standard deduction ($16,100 Single, $32,200 Married Jointly, $24,150 Head of Household in 2026). Crossing into the 22% bracket only taxes the dollars inside that slice—never your entire paycheck.
+          </p>
+          <div className="border border-slate-200 rounded-xl overflow-x-auto bg-white">
             <table className="w-full text-xs text-left">
               <thead className="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
                 <tr>
                   <th className="p-3">Tax Type</th>
                   <th className="p-3">2026 Statutory Rate</th>
-                  <th className="p-3">Income Cap</th>
-                  <th className="p-3">Reduced by Pre-Tax?</th>
+                  <th className="p-3">2026 Income Cap</th>
+                  <th className="p-3">Lowered by Pre-Tax?</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-600">
@@ -797,19 +1026,19 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
                 <tr>
                   <td className="p-3 font-semibold text-slate-900">Social Security (OASDI)</td>
                   <td className="p-3 tabular-nums">6.2%</td>
-                  <td className="p-3 tabular-nums font-mono">$168,600 wage limit</td>
-                  <td className="p-3 text-slate-600">Only Health / HSA</td>
+                  <td className="p-3 tabular-nums font-mono">$184,500 wage limit</td>
+                  <td className="p-3 text-slate-600">Health &amp; payroll HSA only</td>
                 </tr>
                 <tr>
                   <td className="p-3 font-semibold text-slate-900">Medicare</td>
                   <td className="p-3 tabular-nums">1.45% (+0.9% &gt; $200k)</td>
                   <td className="p-3">No cap</td>
-                  <td className="p-3 text-slate-600">Only Health / HSA</td>
+                  <td className="p-3 text-slate-600">Health &amp; payroll HSA only</td>
                 </tr>
                 <tr>
                   <td className="p-3 font-semibold text-slate-900">State Income Tax</td>
                   <td className="p-3 tabular-nums">0% to ~13.3%</td>
-                  <td className="p-3">By state</td>
+                  <td className="p-3">Varies by state</td>
                   <td className="p-3 text-emerald-700 font-semibold">Yes in most states</td>
                 </tr>
               </tbody>
@@ -818,17 +1047,22 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold text-slate-900">4. Paycheck Frequencies: Bi-Weekly vs. Semi-Monthly</h2>
+          <h3 className="text-xl font-bold text-slate-900">
+            4. Bi-Weekly vs. Semi-Monthly Checks &amp; W-4 Fine-Tuning
+          </h3>
           <p className="text-sm text-slate-600 leading-relaxed">
-            Bi-weekly workers receive <strong>26 paychecks each year</strong> (every other week), meaning two months per year have <strong>three paychecks</strong>. Semi-monthly workers receive <strong>24 paychecks per year</strong> (typically the 15th and last day of each month). If you budget based on 2 paychecks each month, bi-weekly schedules give you two bonus paychecks every year to accelerate savings.
+            Bi-weekly employees receive <strong>26 paychecks each year</strong> (every other Friday), creating two calendar months per year with <strong>three paychecks</strong>. Semi-monthly workers receive <strong>24 paychecks per year</strong> (typically the 15th and last business day). If you build your monthly rent and grocery budget around two bi-weekly checks, those two extra checks become effortless savings or debt-payoff boosts.
+          </p>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Finally, if you got a massive refund—or owed money—last April, update your <strong>IRS Form W-4</strong> with HR. Getting a $4,800 tax refund simply means you gave the government a $400/month interest-free loan out of your own paychecks.
           </p>
         </section>
 
         <section className="space-y-4 pt-4 border-t border-slate-200">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Frequently Asked Questions (FAQ)</h2>
-              <p className="text-xs text-slate-500">Essential answers for payroll and tax planning.</p>
+              <h3 className="text-xl font-bold text-slate-900">Frequently Asked Questions (FAQ)</h3>
+              <p className="text-xs text-slate-500">Essential answers for 2026 US payroll and tax planning.</p>
             </div>
             <div className="relative w-full sm:w-64">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -846,14 +1080,18 @@ Net Take-Home Pay = Gross Income - (Pre-Tax Deductions + Federal Tax + State Tax
             {filteredFaqs.map((faq, idx) => {
               const isOpen = expandedFaq === idx;
               return (
-                <div key={idx} className="border border-slate-200 rounded-xl overflow-hidden bg-white">
+                <div key={faq.q} className="border border-slate-200 rounded-xl overflow-hidden bg-white">
                   <button
                     type="button"
                     onClick={() => setExpandedFaq(isOpen ? null : idx)}
                     className="w-full p-4 text-left flex items-center justify-between gap-4 hover:bg-slate-50/70 transition-colors"
                   >
                     <span className="text-xs sm:text-sm font-semibold text-slate-900">{faq.q}</span>
-                    {isOpen ? <ChevronUp className="w-4 h-4 text-slate-500 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-500 shrink-0" />}
+                    {isOpen ? (
+                      <ChevronUp className="w-4 h-4 text-slate-500 shrink-0" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-slate-500 shrink-0" />
+                    )}
                   </button>
                   {isOpen && (
                     <div className="px-4 pb-4 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/30">
