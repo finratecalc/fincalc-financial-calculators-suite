@@ -1,195 +1,117 @@
-import React, { useState } from 'react';
-import {
-  ShieldCheck,
-  Home,
-  Landmark,
-  TrendingUp,
-  Car,
-  PiggyBank,
-  Zap,
-  Percent,
-  Wallet,
-  Layers,
-  FileText,
-} from 'lucide-react';
-import { RetirementCalculator } from './components/RetirementCalculator';
-import { RetirementSeoArticle } from './components/RetirementSeoArticle';
+import React from 'react';
 
-const TOOL_TABS = [
-  { id: 'mortgage', label: 'Mortgage', icon: Home },
-  { id: 'personal', label: 'Personal Loan', icon: Landmark },
-  { id: 'compound', label: 'Compound Interest', icon: TrendingUp },
-  { id: 'auto', label: 'Auto Loan', icon: Car },
-  { id: '401k', label: '401(k) Retirement', icon: PiggyBank },
-  { id: 'extra', label: 'Extra Payments', icon: Zap },
-  { id: 'inflation', label: 'Inflation', icon: Percent },
-  { id: 'takehome', label: 'Take-Home Pay', icon: Wallet },
-  { id: 'directory', label: 'Directory', icon: Layers },
-] as const;
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState<string>('401k');
-
-  const scrollToGuide = () => {
-    const el = document.getElementById('retirement-planner-guide');
-    el?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+export const RetirementSeoArticle: React.FC = () => {
   return (
-    <div className="min-h-screen w-full overflow-x-hidden flex flex-col bg-slate-50 text-slate-900">
-      {/* US Market Rates Strip (Matches FinRateCalc Screenshot) */}
-      <div className="bg-slate-900 text-slate-200 text-xs border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center justify-between gap-x-5 gap-y-1">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
-            <span className="font-bold tracking-wide text-emerald-400">US MARKET RATES</span>
-            <span>
-              30-Yr Mort.: <strong className="text-emerald-400 tabular-nums">6.62%</strong>
-            </span>
-            <span>
-              15-Yr Mort.: <strong className="text-emerald-400 tabular-nums">5.89%</strong>
-            </span>
-            <span>
-              Fed Prime: <strong className="text-emerald-400 tabular-nums">8.00%</strong>
-            </span>
-            <span>
-              S&amp;P 500: <strong className="text-emerald-400 tabular-nums">10.2%</strong>
-            </span>
-            <span>
-              401(k) Cap: <strong className="text-emerald-400 tabular-nums">$23,500</strong>
-            </span>
-            <span>
-              US CPI: <strong className="text-emerald-400 tabular-nums">2.9%</strong>
-            </span>
-          </div>
-          <span className="text-slate-400 text-[11px]">Sources: FRED &amp; IRS</span>
-        </div>
+    <section
+      id="retirement-planner-guide"
+      aria-labelledby="retirement-guide-heading"
+      className="mt-14 pt-10 border-t border-slate-200 text-slate-800 max-w-5xl mx-auto px-4"
+    >
+      <div className="mb-6">
+        <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+          US 401(k) Retirement Guide • 2026 Edition
+        </span>
+        <h2
+          id="retirement-guide-heading"
+          className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-3"
+        >
+          How to Maximize Your 401(k) Nest Egg, Employer Match &amp; Retirement Income
+        </h2>
       </div>
 
-      {/* Primary Header (3-Zone Clean Contract) */}
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-8">
-          <a
-            href="#top"
-            className="flex items-center gap-2.5 text-lg font-extrabold tracking-tight text-slate-900 whitespace-nowrap shrink-0"
-          >
-            <span className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5" />
-            </span>
-            <span>
-              FinRateCalc<span className="text-emerald-600 font-semibold">.com</span>
-            </span>
-          </a>
+      {/* Key Takeaways */}
+      <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 mb-8">
+        <h3 className="text-sm font-bold text-emerald-950 uppercase tracking-wide mb-2">
+          Key Takeaways at a Glance
+        </h3>
+        <ul className="space-y-2 text-xs sm:text-sm text-emerald-900">
+          <li>
+            • <strong>Capture 100% of Employer Match First:</strong> An employer 401(k) match is an
+            immediate, guaranteed 50% to 100% return before market growth even begins.
+          </li>
+          <li>
+            • <strong>IRS Elective Deferral Cap ($23,500):</strong> Employer matching dollars do
+            not count toward your personal $23,500 annual employee deferral limit.
+          </li>
+          <li>
+            • <strong>The 4% Safe Withdrawal Rule:</strong> Every $1,000,000 saved supports roughly
+            $40,000/year ($3,333/month) in inflation-adjusted retirement withdrawals.
+          </li>
+        </ul>
+      </div>
 
-          <nav
-            aria-label="Primary navigation"
-            className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600"
-          >
-            <a
-              href="#how-planner-works"
-              className="hover:text-slate-900 transition-colors whitespace-nowrap shrink-0"
-            >
-              Methodology
-            </a>
-            <a
-              href="#irs-limits"
-              className="hover:text-slate-900 transition-colors whitespace-nowrap shrink-0"
-            >
-              IRS Limits
-            </a>
-            <a
-              href="#traditional-vs-roth"
-              className="hover:text-slate-900 transition-colors whitespace-nowrap shrink-0"
-            >
-              Roth vs. Traditional
-            </a>
-            <a
-              href="#retirement-faq"
-              className="hover:text-slate-900 transition-colors whitespace-nowrap shrink-0"
-            >
-              FAQ
-            </a>
-          </nav>
-
-          <button
-            type="button"
-            onClick={scrollToGuide}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>Read 401(k) Guide</span>
-          </button>
-        </div>
-
-        {/* Tool Tab Strip matching FinRateCalc */}
-        <div className="border-t border-slate-100 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center gap-1.5 overflow-x-auto">
-            {TOOL_TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                    isActive
-                      ? 'bg-slate-900 text-white'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main id="top" className="flex-1 min-w-0 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
-        {activeTab !== '401k' && (
-          <div className="mb-6 rounded-xl border border-slate-200 bg-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-700">
-            <span>
-              Previewing the <strong>401(k) &amp; Retirement Planner</strong> page and SEO guide
-              requested for FinRateCalc.
-            </span>
-            <button
-              type="button"
-              onClick={() => setActiveTab('401k')}
-              className="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-semibold cursor-pointer"
-            >
-              Return to 401(k) Tab
-            </button>
-          </div>
-        )}
-
-        <RetirementCalculator />
-
-        {/* Detailed SEO-Optimized Article Right Below the Calculator */}
-        <RetirementSeoArticle />
-      </main>
-
-      {/* Clean Footer */}
-      <footer className="mt-14 border-t border-slate-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div className="space-y-6 text-sm text-slate-700 leading-relaxed">
+        <div id="how-planner-works" className="space-y-2">
+          <h3 className="text-xl font-bold text-slate-900">
+            How the 401(k) Compounding &amp; Salary Growth Formula Works
+          </h3>
           <p>
-            FinRateCalc US Financial Tools · Educational projections only; not personalized tax or
-            investment advice.
+            This planner models annual salary increases, your percentage contribution, your
+            employer&apos;s matching formula, and compound market returns each year until your
+            target retirement age. Because contributions scale alongside merit raises, maintaining a
+            consistent savings percentage accelerates wealth significantly in your 40s and 50s.
           </p>
-          <div className="flex items-center gap-5">
-            <a href="#irs-limits" className="hover:text-slate-800">
-              IRS Limits
-            </a>
-            <a href="#four-percent-rule" className="hover:text-slate-800">
-              4% Rule
-            </a>
-            <a href="#retirement-faq" className="hover:text-slate-800">
-              401(k) FAQ
-            </a>
+        </div>
+
+        <div id="irs-limits" className="space-y-2">
+          <h3 className="text-xl font-bold text-slate-900">
+            IRS 401(k) Contribution Caps &amp; Catch-Up Rules
+          </h3>
+          <p>
+            Under IRS guidelines, employees can defer up to <strong>$23,500</strong> per year in
+            pre-tax Traditional or after-tax Roth 401(k) contributions, with additional catch-up
+            contributions available starting at age 50. Total combined employee plus employer
+            contributions follow the higher IRS Section 415(c) plan limit.
+          </p>
+        </div>
+
+        <div id="traditional-vs-roth" className="space-y-2">
+          <h3 className="text-xl font-bold text-slate-900">
+            Traditional 401(k) vs. Roth 401(k)
+          </h3>
+          <p>
+            Traditional 401(k) deferrals lower your taxable income today and grow tax-deferred until
+            withdrawal, making them attractive during peak earning years. Roth 401(k) contributions
+            are taxed upfront, allowing qualified withdrawals and all investment earnings in
+            retirement to remain 100% federal tax-free.
+          </p>
+        </div>
+
+        <div id="four-percent-rule" className="space-y-2">
+          <h3 className="text-xl font-bold text-slate-900">
+            Understanding the 4% Safe Withdrawal Rule
+          </h3>
+          <p>
+            Derived from the Trinity Study, the 4% rule estimates how much you can withdraw in year
+            one of retirement (and adjust for CPI inflation each year after) from a diversified
+            stock-and-bond portfolio with a high probability of lasting 30+ years.
+          </p>
+        </div>
+
+        <div id="retirement-faq" className="space-y-3 pt-2">
+          <h3 className="text-xl font-bold text-slate-900">Frequently Asked Questions (FAQ)</h3>
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h4 className="font-bold text-slate-900 text-sm">
+              Does employer matching count toward my $23,500 401(k) limit?
+            </h4>
+            <p className="mt-1 text-xs text-slate-600">
+              No. Your $23,500 cap applies only to your own elective salary deferrals. Employer
+              matching and profit-sharing contributions sit on top of your personal deferral limit.
+            </p>
+          </div>
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h4 className="font-bold text-slate-900 text-sm">
+              What rate of return should I use for a long-term 401(k) forecast?
+            </h4>
+            <p className="mt-1 text-xs text-slate-600">
+              Many US retirement planners model 7% to 8% nominal returns (or 5% to 7.5% real
+              inflation-adjusted returns) for diversified equity-heavy portfolios over 20+ years.
+            </p>
           </div>
         </div>
-      </footer>
-    </div>
+      </div>
+    </section>
   );
-}
+};
+
+export default RetirementSeoArticle;
