@@ -1,4 +1,4 @@
-import { RetirementSeoArticle } from './components/RetirementSeoArticle';
+import { RetirementSeoArticle } from './RetirementSeoArticle';
 import React, { useState, useMemo } from 'react';
 import { PiggyBank, Sparkles, TrendingUp, Gift, Download } from 'lucide-react';
 import { Retirement401kInputs, Retirement401kResult } from '../types';
@@ -286,7 +286,7 @@ export const Retirement401kCalculator: React.FC<Retirement401kCalculatorProps> =
                     %
                   </span>
                 </div>
-                <span className="text-[10px] text-slate-400">S&P 500 historic real avg: 7.5%</span>
+                <span className="text-[10px] text-slate-400">S&amp;P 500 historic real avg: 7.5%</span>
               </div>
 
               <div>
@@ -310,7 +310,7 @@ export const Retirement401kCalculator: React.FC<Retirement401kCalculatorProps> =
                     %
                   </span>
                 </div>
-                <span className="text-[10px] text-slate-400">Typical US merit merit increase: 3%</span>
+                <span className="text-[10px] text-slate-400">Typical US merit increase: 3%</span>
               </div>
             </div>
           </div>
