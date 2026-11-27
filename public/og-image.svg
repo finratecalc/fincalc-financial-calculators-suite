@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0F172A"/>
+  <rect x="48" y="48" width="1104" height="534" rx="20" fill="#1E293B" stroke="#334155" stroke-width="2"/>
+  <rect x="88" y="96" width="64" height="64" rx="14" fill="#059669"/>
+  <path d="M120 112 L138 120 V132 C138 143 130 151 120 155 C110 151 102 143 102 132 V120 Z" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M113 132 L118 137 L128 126" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="172" y="138" fill="#FFFFFF" font-family="system-ui, -apple-system, sans-serif" font-size="38" font-weight="800">FinRateCalc.com</text>
+  <text x="88" y="248" fill="#FFFFFF" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="800">US Precision Financial Calculators</text>
+  <text x="88" y="312" fill="#CBD5E1" font-family="system-ui, -apple-system, sans-serif" font-size="28">Mortgage · 401(k) · Auto Loan · Take-Home Pay · Compound Interest · Inflation</text>
+  <rect x="88" y="388" width="320" height="120" rx="14" fill="#0F172A" stroke="#334155"/>
+  <text x="114" y="432" fill="#94A3B8" font-family="system-ui, sans-serif" font-size="16">BENCHMARK RATES</text>
+  <text x="114" y="476" fill="#34D399" font-family="monospace" font-size="24" font-weight="700">FRED &amp; IRS 2026</text>
+  <rect x="436" y="388" width="320" height="120" rx="14" fill="#0F172A" stroke="#334155"/>
+  <text x="462" y="432" fill="#94A3B8" font-family="system-ui, sans-serif" font-size="16">EXPORTS</text>
+  <text x="462" y="476" fill="#FFFFFF" font-family="system-ui, sans-serif" font-size="23" font-weight="700">PDF &amp; CSV Schedules</text>
+  <rect x="784" y="388" width="328" height="120" rx="14" fill="#0F172A" stroke="#334155"/>
+  <text x="810" y="432" fill="#94A3B8" font-family="system-ui, sans-serif" font-size="16">PRIVACY</text>
+  <text x="810" y="476" fill="#FFFFFF" font-family="system-ui, sans-serif" font-size="24" font-weight="700">100% Client-Side</text>
+</svg>
