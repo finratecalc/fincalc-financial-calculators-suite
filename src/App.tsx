@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CalculatorType, MarketRate, RecentCalculation } from './types';
 import { Header } from './components/Header';
 import { MortgageCalculator } from './components/MortgageCalculator';
@@ -14,13 +14,39 @@ import { ScenarioComparisonModal } from './components/ScenarioComparisonModal';
 import { ReportModal } from './components/ReportModal';
 import { Footer } from './components/Footer';
 import { calculateMortgage } from './utils/calculators';
+import { applyCalculatorSEO, CALC_SEO_META, getCalcFromPathname } from './seoConfig';
 
 export default function App() {
-  const [activeCalc, setActiveCalc] = useState<CalculatorType>('mortgage');
+  const [activeCalc, setActiveCalc] = useState<CalculatorType>(() =>
+    getCalcFromPathname(window.location.pathname)
+  );
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportTitle, setReportTitle] = useState('US Financial Analysis Report');
   const [reportData, setReportData] = useState<any>(null);
+
+  // Sync URL and dynamic SEO tags whenever calculator changes
+  useEffect(() => {
+    applyCalculatorSEO(activeCalc);
+  }, [activeCalc]);
+
+  // Support browser Back / Forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      setActiveCalc(getCalcFromPathname(window.location.pathname));
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateToCalc = useCallback((type: CalculatorType) => {
+    setActiveCalc(type);
+    const meta = CALC_SEO_META[type] ?? CALC_SEO_META.mortgage;
+    if (window.location.pathname !== meta.slug) {
+      window.history.pushState({}, '', meta.slug);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   // Recent calculations state initialized from localStorage
   const [recentCalculations, setRecentCalculations] = useState<RecentCalculation[]>(() => {
@@ -30,7 +56,6 @@ export default function App() {
     } catch (e) {
       // ignore
     }
-    // Default initial mock history item so the Recent counter has data like the screenshot
     return [
       {
         id: 'rec-1',
@@ -74,7 +99,7 @@ export default function App() {
   // Handle clicking market rate in the top bar
   const handleApplyMarketRate = (rate: MarketRate) => {
     if (rate.targetCalc) {
-      setActiveCalc(rate.targetCalc);
+      navigateToCalc(rate.targetCalc);
     }
   };
 
@@ -84,7 +109,6 @@ export default function App() {
       setReportTitle(title);
       setReportData(data);
     } else {
-      // Default report from mortgage
       const defaultCalc = calculateMortgage({
         homePrice: 400000,
         downPaymentPercent: 20,
@@ -114,7 +138,7 @@ export default function App() {
   };
 
   const handleSelectRecent = (item: RecentCalculation) => {
-    setActiveCalc(item.type);
+    navigateToCalc(item.type);
   };
 
   return (
@@ -122,7 +146,7 @@ export default function App() {
       {/* Header */}
       <Header
         activeCalc={activeCalc}
-        onSelectCalc={(type) => setActiveCalc(type)}
+        onSelectCalc={navigateToCalc}
         onOpenReport={() => handleOpenReport()}
         onOpenCompare={() => setIsCompareOpen(true)}
         onApplyMarketRate={handleApplyMarketRate}
@@ -165,12 +189,12 @@ export default function App() {
         )}
 
         {activeCalc === 'directory' && (
-          <AllCalculatorsDirectory onSelectCalc={(type) => setActiveCalc(type)} />
+          <AllCalculatorsDirectory onSelectCalc={navigateToCalc} />
         )}
       </main>
 
       {/* Footer */}
-      <Footer onSelectCalc={(type) => setActiveCalc(type)} />
+      <Footer onSelectCalc={navigateToCalc} />
 
       {/* Modals */}
       <ScenarioComparisonModal
